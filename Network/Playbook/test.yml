@@ -9,6 +9,7 @@
           - /system resource print
       register: address_list_print
 
+
     - name: Show system resources
       debug:
         var: address_list_print.stdout_lines
