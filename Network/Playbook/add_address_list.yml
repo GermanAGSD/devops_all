@@ -1,0 +1,17 @@
+---
+- name: RouterOS remove address list
+  hosts: all
+  gather_facts: true
+  tasks:
+
+    - name: Gather system resources
+      community.routeros.command:
+        commands:
+          - /ip fi address-list remove [find list=direct]
+          - /ip firewall address-list add list=direct address=192.168.0.0/24
+      register: remove_address
+
+
+    - name: Show system resources
+      debug:
+        var: remove_address.stdout_lines

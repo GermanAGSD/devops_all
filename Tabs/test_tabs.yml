@@ -1,0 +1,23 @@
+---
+- name: Tabs test
+  hosts: all
+  gather_facts: true
+  tasks:
+
+    - name: Run a command as nobody
+      command: somecommand
+      become: true
+      become_method: su
+      become_user: nobody
+      become_flags: '-s /bin/sh'
+
+    - name: su
+      ansible.builtin.command: su
+      register: su
+
+    - name: Show su
+      debug:
+        var: su.stdout_lines
+
+    - name: Gather facts
+      community.routeros.facts:

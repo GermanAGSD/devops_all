@@ -1,0 +1,41 @@
+---
+- name: Download RouterOS backup
+  hosts: routeros
+  gather_facts: false
+  collections:
+    - ansible.network
+
+  tasks:
+    - name: Execute backup command
+      network_cli_command:
+        transport: cli
+        command_string: "/system backup save name=backup_file"
+      register: backup_output
+
+    - name: Download backup file
+      fetch:
+        src: "/backup_file.backup"
+        dest: "/local/path/to/save/backup_file.backup"
+        flat: yes
+      delegate_to: localhost
+
+
+    - name: backup-file create
+      routeros_command:
+        commands: /system backup save name=backup_spw
+    - name: backup-file download
+      net_get:
+        src: backup_spw.backup
+        protocol: sftp
+
+    - name: file upload
+      net_put:
+        src: ./spw_script
+        protocol: sftp
+# Examples
+    - name: File demonstate after
+      routeros_command:
+        commands: /file print
+      register: file_after
+    - name: debug print after
+      debug: var=file_after.stdout_lines

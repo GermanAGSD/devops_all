@@ -1,0 +1,24 @@
+---
+- name: RouterOS add firewall rules
+  hosts: all
+  gather_facts: true
+
+  vars:
+    export_dir: Data
+
+  tasks:
+    - name: Gather system resources
+      community.routeros.command:
+        commands:
+          - /system script run net-addresses
+      register: system_resource_print
+
+    - name: Save result to file
+      copy:
+        content: "{{ system_resource_print.stdout[0] }}"
+        dest: /home/semaphore/output.txt
+
+    - name: file download
+      net_get:
+        src: "net_list.txt"
+        protocol: sftp
