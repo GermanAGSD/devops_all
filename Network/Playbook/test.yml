@@ -17,9 +17,9 @@
     - name: Gather facts
       community.routeros.facts:
 
-#    - name: run multiple commands on remote nodes
-#      routeros_command:
-#        commands:
-#          - /system routerboard print
-#          - /system identity print
+    - name: run multiple commands on remote nodes
+      routeros_command:
+        commands:
+          - /system routerboard print
+          - /system identity print
 
