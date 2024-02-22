@@ -1,7 +1,7 @@
 ---
 - name: RouterOS test
   hosts: all
-  gather_facts: true
+  gather_facts: no
   tasks:
     - name: Gather system resources
       community.routeros.command:
@@ -13,9 +13,9 @@
       debug:
         var: address_list_print.stdout_lines
 
-
-    - name: Gather facts
-      community.routeros.facts:
+#
+#    - name: Gather facts
+#      community.routeros.facts:
 
 #    - name: run multiple commands on remote nodes
 #      routeros_command:

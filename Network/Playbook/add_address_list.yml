@@ -1,7 +1,7 @@
 ---
 - name: RouterOS remove address list
   hosts: all
-  gather_facts: true
+  gather_facts: no
   tasks:
 
     - name: Gather system resources
