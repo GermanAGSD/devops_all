@@ -6,7 +6,6 @@
   tasks:
     - name: Change to home directory
       command: cd ~
-
     - name: Download nodesource setup script
       command: curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
 
