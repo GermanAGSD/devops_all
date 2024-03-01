@@ -22,3 +22,11 @@
       ansible.builtin.apt:
         name: zabbix-agent
 
+    - name: Install the package "git
+      ansible.builtin.apt:
+        name: git
+    - name: Clone repository
+      git:
+        repo: https://gitlab.thebull.ru/Kuznetsov/magicmirrorqr.git
+        dest: /home/rock/electron_qr
+        version: master
