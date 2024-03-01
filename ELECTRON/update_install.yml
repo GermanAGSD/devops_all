@@ -25,8 +25,20 @@
     - name: Install the package "git
       ansible.builtin.apt:
         name: git
+
+    - name: Echo IP address
+      lineinfile:
+        path: /etc/resolv.conf
+        line: 'nameserver 172.30.30.3'
+
     - name: Clone repository
       git:
         repo: https://gitlab.thebull.ru/Kuznetsov/magicmirrorqr.git
         dest: /home/rock/electron_qr
         version: master
+
+    - name: Run npm install
+      command: npm install
+      args:
+        chdir: /home/rock/electron_qr/magicmirrorqr
+

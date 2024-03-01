@@ -1,0 +1,27 @@
+---
+- name: Update Debian systems
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Clone repository
+      git:
+        repo: https://gitlab.thebull.ru/Kuznetsov/magicmirrorqr.git
+        dest: /home/rock/electron_qr
+        version: master
+
+    - name: Run npm install
+      command: npm install
+      args:
+        chdir: /home/rock/electron_qr/magicmirrorqr
+
+    - name: Download nodesource setup script
+      command: wget https://github.com/radxa/backup-sh/blob/master/rockpi-backup.sh
+      dst: /home/rock/buckup
+
+    - name: Make the setup script executable
+      command: chmod +x rockpi-backup.sh
+
+    - name: Execute the setup script
+      command: bash rockpi-backup.sh
+
