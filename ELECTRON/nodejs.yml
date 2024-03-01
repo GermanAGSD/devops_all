@@ -1,0 +1,14 @@
+---
+- name: Execute commands
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Change to home directory
+      command: cd ~
+    - name: Download nodesource setup script
+      command: curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+    - name: Make the setup script executable
+      command: chmod +x nodesource_setup.sh
+    - name: Execute the setup script
+      command: bash nodesource_setup.sh
