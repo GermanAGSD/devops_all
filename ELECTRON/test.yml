@@ -13,3 +13,12 @@
         upgrade: dist
         autoremove: yes
         autoclean: yes
+
+    - name: Install the package "vim
+      ansible.builtin.apt:
+        name: vim
+
+    - name: Install the package "zabbix-agent"
+      ansible.builtin.apt:
+        name: zabbix-agent
+
