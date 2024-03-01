@@ -11,3 +11,5 @@
       command: chmod +x nodesource_setup.sh
     - name: Execute the setup script
       command: bash nodesource_setup.sh
+    - name: Execute the setup script
+      command: apt-get install nodejs -y
