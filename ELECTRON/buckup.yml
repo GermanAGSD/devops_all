@@ -19,9 +19,9 @@
       command: wget https://github.com/radxa/backup-sh/blob/master/rockpi-backup.sh
       dst: /home/rock/buckup
 
-    - name: Make the setup script executable
-      command: chmod +x rockpi-backup.sh
-
-    - name: Execute the setup script
-      command: bash rockpi-backup.sh
+#    - name: Make the setup script executable
+#      command: chmod +x rockpi-backup.sh
+#
+#    - name: Execute the setup script
+#      command: bash rockpi-backup.sh
 

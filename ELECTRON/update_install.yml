@@ -1,8 +1,9 @@
 ---
-- name: Update Debian systems
+- name: Update systems
   hosts: all
   become: yes
   tasks:
+
     - name: Update apt cache
       apt:
         update_cache: yes
@@ -22,14 +23,30 @@
       ansible.builtin.apt:
         name: zabbix-agent
 
-    - name: Install the package "git
+    - name: Install the package "git"
       ansible.builtin.apt:
         name: git
+
+    - name: Install the package "gparted"
+      ansible.builtin.apt:
+        name: gparted
 
     - name: Echo IP address
       lineinfile:
         path: /etc/resolv.conf
         line: 'nameserver 172.30.30.3'
+
+    - name: Download nodesource setup script
+      command: curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+
+    - name: Make the setup script executable
+      command: chmod +x nodesource_setup.sh
+
+    - name: Execute the setup script
+      command: bash nodesource_setup.sh
+
+    - name: Execute the setup script
+      command: apt-get install nodejs -y
 
     - name: Clone repository
       git:
