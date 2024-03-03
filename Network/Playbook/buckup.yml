@@ -1,21 +1,26 @@
 ---
-- name: Backup Mikrotik
+- name: RouterOS Backup
   hosts: all
-  gather_facts: false
-  vars:
-    backup_dir: "/home/luca/network/backup"
+  gather_facts: true
   tasks:
-    - name: Export
-      ansible.builtin.shell: >-
-        sshpass -p '{{ ansible_password }}' ssh -o StrictHostKeyChecking=no {{ ansible_user }}@{{ inventory_hostname }} /export
-      register: export
-      delegate_to: localhost
+    -
+    - name: Set Backup Time
+      set_fact:
+        time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-    - name: Backup
-      ansible.builtin.copy:
-        content: "{{ export.stdout }}"
-        dest: "{{ backup_dir }}/{{ inventory_hostname }}_config.{{ lookup('pipe', 'date +%Y-%m-%d@%H:%M:%S') }}"
-      when: export is defined
-      delegate_to: localhost
+    - name: Starting ROS System Backup
+      community.routeros.command:
+        commands: "/system backup save name {{ time }}-{{ inventory_hostname }}"
 
-        
+    - name: Copying ROS System Backup to Local Host
+      ansible.builtin.fetch:
+        src: "/file/{{ inventory_hostname }}.backup"
+        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
+
+#    - name: Test
+#      ansible.netcommon.net_get:
+#        src: "10.0.2.10.backup"
+#        dest: "/home/semaphore/10.0.2.10.backup"
+#    - name: "Starting ROS Configuration Backup"
+#      community.routeros.command:
+#        commands: /export show-sensitive file={{inventory_hostname}}
