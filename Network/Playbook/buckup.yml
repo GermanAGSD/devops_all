@@ -10,7 +10,7 @@
 
     - name: backup-resource create
       routeros_command:
-        commands: export file={{ file_name }}.rsc
+        commands: export file={{ inventory_hostname }}.rsc
 
     - name: backup-file download
       ansible.netcommon.net_get:
