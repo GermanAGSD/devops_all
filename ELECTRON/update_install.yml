@@ -57,5 +57,5 @@
     - name: Run npm install
       command: npm install
       args:
-        chdir: /home/rock/electron_qr/magicmirrorqr
+        chdir: /home/rock/electron_qr
 
