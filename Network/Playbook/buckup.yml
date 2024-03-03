@@ -11,22 +11,26 @@
 #    - name: backup-resource create
 #      routeros_command:
 #        commands: export file={{ inventory_hostname }}.rsc
-#
-#    - name: Starting ROS System Backup
-#      community.routeros.command:
-#        commands: "/system backup save name {{ inventory_hostname }}"
 
     - name: backup-file download
       ansible.netcommon.net_get:
-        src: "{{ inventory_hostname }}--time.backup"
+        src: "{{ inventory_hostname }}.backup"
         dest: /home/semaphore/buckup/{{ inventory_hostname }}.backup
         protocol: sftp
 
     - name: backup-resource download
       ansible.netcommon.net_get:
-        src: "{{ inventory_hostname }}--time.rsc"
+        src: "{{ inventory_hostname }}.rsc"
         dest: /home/semaphore/buckup/{{ inventory_hostname }}.rsc
         protocol: sftp
+#    - name: Starting ROS System Backup
+#      community.routeros.command:
+#        commands: "/system backup save name {{ inventory_hostname }}"
+
+#    - name: Copying ROS System Backup to Local Host
+#      ansible.builtin.fetch:
+#        src: "{{ inventory_hostname }}.backup"
+#        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
 
 #    - name: Test
 #      ansible.netcommon.net_get:
