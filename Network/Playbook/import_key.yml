@@ -21,5 +21,4 @@
       routeros_command:
         commands:
           - /user ssh-keys import public-key-file={{inventory_hostname}}_ssh.pub user=badm
-          -
 # key-owner=badm
