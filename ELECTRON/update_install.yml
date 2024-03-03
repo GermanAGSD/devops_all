@@ -5,6 +5,8 @@
   become: yes
   tasks:
 
+    - name: Execute the setup script
+      command: apt upgrade
 
     - name: Install the package "vim
       ansible.builtin.apt:
