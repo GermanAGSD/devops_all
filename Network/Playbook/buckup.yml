@@ -8,14 +8,29 @@
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
+    - name: backup-resource create
+      routeros_command:
+        commands: export file={{ file_name }}.rsc
+
+    - name: backup-file download
+      ansible.netcommon.net_get:
+        src: "{{ inventory_hostname }}.backup"
+        dest: /home/{{ file_name }}.backup
+        protocol: sftp
+
+    - name: backup-resource download
+      ansible.netcommon.net_get:
+        src: "{{ inventory_hostname }}.rsc"
+        dest: /home/{{ inventory_hostname }}.rsc
+        protocol: sftp
 #    - name: Starting ROS System Backup
 #      community.routeros.command:
 #        commands: "/system backup save name {{ inventory_hostname }}"
 
-    - name: Copying ROS System Backup to Local Host
-      ansible.builtin.fetch:
-        src: "/""{{ inventory_hostname }}.backup"
-        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
+#    - name: Copying ROS System Backup to Local Host
+#      ansible.builtin.fetch:
+#        src: "{{ inventory_hostname }}.backup"
+#        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
 
 #    - name: Test
 #      ansible.netcommon.net_get:
