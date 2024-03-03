@@ -1,6 +1,6 @@
 ---
 - name: Backup Mikrotik
-  hosts: mikrotik
+  hosts: all
   gather_facts: false
   vars:
     backup_dir: "/home/luca/network/backup"
