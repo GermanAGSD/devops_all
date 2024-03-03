@@ -10,7 +10,7 @@
 
     - name: Starting ROS System Backup
       community.routeros.command:
-        commands: "/system backup save name {{ time }}-{{ inventory_hostname }}"
+        commands: "/system backup save name {{ inventory_hostname }}"
 
     - name: Copying ROS System Backup to Local Host
       ansible.builtin.fetch:
