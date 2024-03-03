@@ -14,7 +14,7 @@
 
     - name: Copying ROS System Backup to Local Host
       ansible.builtin.fetch:
-        src: "/{{ inventory_hostname }}.backup"
+        src: "{{ inventory_hostname }}.backup"
         dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
 
 #    - name: Test
