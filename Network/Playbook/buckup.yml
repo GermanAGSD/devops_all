@@ -8,9 +8,9 @@
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-    - name: Starting ROS System Backup
-      community.routeros.command:
-        commands: "/system backup save name {{ inventory_hostname }}"
+#    - name: Starting ROS System Backup
+#      community.routeros.command:
+#        commands: "/system backup save name {{ inventory_hostname }}"
 
     - name: Copying ROS System Backup to Local Host
       ansible.builtin.fetch:
