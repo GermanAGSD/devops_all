@@ -1,19 +1,10 @@
+# for arm bian apt update cache not available
 ---
 - name: Update systems
   hosts: all
   become: yes
   tasks:
 
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
-    - name: Upgrade packages
-      apt:
-        upgrade: dist
-        autoremove: yes
-        autoclean: yes
 
     - name: Install the package "vim
       ansible.builtin.apt:
@@ -30,6 +21,10 @@
     - name: Install the package "gparted"
       ansible.builtin.apt:
         name: gparted
+
+    - name: Install the package "pm2"
+      ansible.builtin.apt:
+        name: pm2
 
     - name: Echo IP address
       lineinfile:
