@@ -15,13 +15,13 @@
     - name: backup-file download
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.backup"
-        dest: /home/semaphore/buckup/{{ inventory_hostname }}--time.backup
+        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }.backup
         protocol: sftp
 
     - name: backup-resource download
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.rsc"
-        dest: /home/semaphore/buckup/{{ inventory_hostname }}--time.rsc
+        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }.rsc
         protocol: sftp
 #    - name: Starting ROS System Backup
 #      community.routeros.command:
