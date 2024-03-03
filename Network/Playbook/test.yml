@@ -12,7 +12,7 @@
     - name: Save result to file
       copy:
         content: "{{ address_list_print.stdout }}"
-        dest: .
+        dest: ../Data/result
       delegate_to: localhost
 
     - name: Show system resources
