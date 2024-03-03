@@ -15,7 +15,7 @@
     - name: backup-file download
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.backup"
-        dest: /home/{{ inventory_hostname }}.backup
+        dest: /home/ansible/buckup/{{ inventory_hostname }}.backup
         protocol: sftp
 
     - name: backup-resource download
