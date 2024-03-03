@@ -17,18 +17,13 @@
       community.routeros.command:
         commands: "system backup save dont-encrypt=yes name {{ inventory_hostname }}"
 
-    - name: Copying ROS System Backup to Local Host
-      ansible.builtin.fetch:
-        src: "{{ inventory_hostname }}.backup"
-        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
-
-    - name: backup-file download
+    - name: Downloading buckup file
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.backup"
         dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.backup
         protocol: sftp
 
-    - name: backup-resource download
+    - name: Downloading configuration files
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.rsc"
         dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.rsc
@@ -41,6 +36,11 @@
     - name: remove backup
       routeros_command:
         commands: /file remove [find name~".*\\.rsc\$"]
+
+#    - name: Copying ROS System Backup to Local Host
+#      ansible.builtin.fetch:
+#        src: "{{ inventory_hostname }}.backup"
+#        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
 #    - name: Test
 #      ansible.netcommon.net_get:
 #        src: "10.0.2.10.backup"
