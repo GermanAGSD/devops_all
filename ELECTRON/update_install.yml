@@ -8,7 +8,7 @@
 #    - name: Execute the setup script
 #      command: apt upgrade -y
 
-    - name: Install the package "vim
+    - name: Install the package "vim"
       ansible.builtin.apt:
         name: vim
 
