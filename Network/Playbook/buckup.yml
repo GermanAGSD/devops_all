@@ -8,14 +8,14 @@
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-    - name: backup-resource create
-      routeros_command:
-        commands: export file={{ inventory_hostname }}.rsc
+#    - name: backup-resource create
+#      routeros_command:
+#        commands: export file={{ inventory_hostname }}.rsc
 
     - name: backup-file download
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.backup"
-        dest: /home/{{ file_name }}.backup
+        dest: /home/{{ inventory_hostname }}.backup
         protocol: sftp
 
     - name: backup-resource download
