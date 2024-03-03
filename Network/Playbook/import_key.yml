@@ -5,17 +5,17 @@
 
 
   tasks:
-#    - name: Upload files
-#      net_put:
-#        src: ../Keys/badm.pub
-#        dest: /{{inventory_hostname}}_ssh.pub
-#        protocol: sftp
-#
-#    - name: Upload files
-#      net_put:
-#        src: ../Keys/badm_key
-#        dest: /{{inventory_hostname}}_sshkey
-#        protocol: sftp
+    - name: Upload files
+      net_put:
+        src: ../Keys/badm.pub
+        dest: /{{inventory_hostname}}_ssh.pub
+        protocol: sftp
+
+    - name: Upload files
+      net_put:
+        src: ../Keys/badm_key
+        dest: /{{inventory_hostname}}_sshkey
+        protocol: sftp
 
     - name: import hostkey
       routeros_command:
