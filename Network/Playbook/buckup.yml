@@ -8,33 +8,39 @@
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-#    - name: backup-resource create
-#      routeros_command:
-#        commands: export file={{ inventory_hostname }}.rsc
+    - name: backup-resource create
+      routeros_command:
+        commands: export file={{ inventory_hostname }}.rsc
+
+#  system backup save dont-encrypt=yes name {{ inventory_hostname }}
+    - name: Starting ROS System Backup
+      community.routeros.command:
+        commands: "system backup save dont-encrypt=yes name {{ inventory_hostname }}"
+
+    - name: Copying ROS System Backup to Local Host
+      ansible.builtin.fetch:
+        src: "{{ inventory_hostname }}.backup"
+        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
+
+    - name: backup-file download
+      ansible.netcommon.net_get:
+        src: "{{ inventory_hostname }}.backup"
+        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.backup
+        protocol: sftp
+
+    - name: backup-resource download
+      ansible.netcommon.net_get:
+        src: "{{ inventory_hostname }}.rsc"
+        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.rsc
+        protocol: sftp
+
     - name: remove backup
       routeros_command:
         commands: /file remove [find name~".*\\.backup\$"]
 
-#    - name: backup-file download
-#      ansible.netcommon.net_get:
-#        src: "{{ inventory_hostname }}.backup"
-#        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.backup
-#        protocol: sftp
-#
-#    - name: backup-resource download
-#      ansible.netcommon.net_get:
-#        src: "{{ inventory_hostname }}.rsc"
-#        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.rsc
-#        protocol: sftp
-#    - name: Starting ROS System Backup
-#      community.routeros.command:
-#        commands: "/system backup save name {{ inventory_hostname }}"
-
-#    - name: Copying ROS System Backup to Local Host
-#      ansible.builtin.fetch:
-#        src: "{{ inventory_hostname }}.backup"
-#        dest: "~/home/{{ inventory_hostname }}-{{ time }}.backup"
-
+    - name: remove backup
+      routeros_command:
+        commands: /file remove [find name~".*\\.rsc\$"]
 #    - name: Test
 #      ansible.netcommon.net_get:
 #        src: "10.0.2.10.backup"
