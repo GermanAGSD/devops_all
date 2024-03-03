@@ -21,7 +21,7 @@
     - name: backup-resource download
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.rsc"
-        dest: /home/{{ inventory_hostname }}.rsc
+        dest: /home/ansible/buckup/{{ inventory_hostname }}.rsc
         protocol: sftp
 #    - name: Starting ROS System Backup
 #      community.routeros.command:

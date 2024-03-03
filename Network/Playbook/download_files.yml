@@ -9,13 +9,13 @@
     - name: Execute backup command
       network_cli_command:
         transport: cli
-        command_string: "/system backup save name=backup_file"
+        command_string: "/system backup save name={{ inventory_hostname }}.buckup"
       register: backup_output
 
     - name: Download backup file
       fetch:
-        src: "/backup_file.backup"
-        dest: "/local/path/to/save/backup_file.backup"
+        src: "/{{ inventory_hostname }}.backup"
+        dest: "/home/buckup/backup_file.backup"
         flat: yes
       delegate_to: localhost
 
