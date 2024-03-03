@@ -13,7 +13,7 @@
 #        commands: export file={{ inventory_hostname }}.rsc
     - name: remove backup
       routeros_command:
-        commands: /file/remove [/file find where name~"^backup-.*\$"]
+        commands: /file/remove [/file find where name~"*\$.backup.*\$"]
 
 #    - name: backup-file download
 #      ansible.netcommon.net_get:
