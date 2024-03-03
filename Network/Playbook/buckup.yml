@@ -8,13 +8,13 @@
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-    - name: backup-resource create
-      routeros_command:
-        commands: export file={{ inventory_hostname }}.rsc
-
-    - name: Starting ROS System Backup
-      community.routeros.command:
-        commands: "/system backup save name {{ inventory_hostname }}"
+#    - name: backup-resource create
+#      routeros_command:
+#        commands: export file={{ inventory_hostname }}.rsc
+#
+#    - name: Starting ROS System Backup
+#      community.routeros.command:
+#        commands: "/system backup save name {{ inventory_hostname }}"
 
     - name: backup-file download
       ansible.netcommon.net_get:
