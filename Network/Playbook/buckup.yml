@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: true
   tasks:
-    -
+
     - name: Set Backup Time
       set_fact:
         time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
