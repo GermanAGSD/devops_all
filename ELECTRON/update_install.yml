@@ -52,7 +52,6 @@
       args:
         chdir: /home/rock/electron_qr
 
-    - name: Install the package "pm2"
-      ansible.builtin.apt:
-        name: pm2
+    - name: Execute the setup script
+      command: systemctl enable zabbix-agent
 
