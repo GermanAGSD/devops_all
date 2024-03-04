@@ -24,10 +24,6 @@
       ansible.builtin.apt:
         name: gparted
 
-    - name: Install the package "pm2"
-      ansible.builtin.apt:
-        name: pm2
-
     - name: Echo IP address
       lineinfile:
         path: /etc/resolv.conf
@@ -55,4 +51,8 @@
       command: npm install
       args:
         chdir: /home/rock/electron_qr
+
+    - name: Install the package "pm2"
+      ansible.builtin.apt:
+        name: pm2
 
