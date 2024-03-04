@@ -55,3 +55,8 @@
     - name: Execute the setup script
       command: systemctl enable zabbix-agent
 
+    - name: Execute the setup script
+      command: wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb
+
+    - name: Execute the setup script
+      command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
