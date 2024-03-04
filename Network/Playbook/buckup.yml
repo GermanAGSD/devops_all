@@ -37,6 +37,7 @@
       routeros_command:
         commands: /file remove [find name~".*\\.rsc\$"]
 
+
 #    - name: Copying ROS System Backup to Local Host
 #      ansible.builtin.fetch:
 #        src: "{{ inventory_hostname }}.backup"
