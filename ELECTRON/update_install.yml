@@ -12,56 +12,56 @@
         name:
           - "docker==6.1.3"
           - "docker-compose"
-#
-#    - name: Install the package "vim"
-#      ansible.builtin.apt:
-#        name: vim
-#
-#    - name: Install the package "zabbix-agent"
-#      ansible.builtin.apt:
-#        name: zabbix-agent
-#
-#    - name: Install the package "git"
-#      ansible.builtin.apt:
-#        name: git
-#
-#    - name: Install the package "gparted"
-#      ansible.builtin.apt:
-#        name: gparted
-#
-#    - name: Echo IP address
-#      lineinfile:
-#        path: /etc/resolv.conf
-#        line: 'nameserver 172.30.30.3'
-#
-#    - name: Download nodesource setup script
-#      command: curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
-#
-#    - name: Make the setup script executable
-#      command: chmod +x nodesource_setup.sh
-#
-#    - name: Execute the setup script
-#      command: bash nodesource_setup.sh
-#
-#    - name: Execute the setup script
-#      command: apt-get install nodejs -y
-#
-#    - name: Clone repository
-#      git:
-#        repo: https://gitlab.thebull.ru/Kuznetsov/magicmirrorqr.git
-#        dest: /home/rock/electron_qr
-#        version: master
-#
-#    - name: Run npm install
-#      command: npm install
-#      args:
-#        chdir: /home/rock/electron_qr
-#
-#    - name: Execute the setup script
-#      command: systemctl enable zabbix-agent
-#
-#    - name: Execute the setup script
-#      command: wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb
-#
-#    - name: Execute the setup script
-#      command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
+
+    - name: Install the package "vim"
+      ansible.builtin.apt:
+        name: vim
+
+    - name: Install the package "zabbix-agent"
+      ansible.builtin.apt:
+        name: zabbix-agent
+
+    - name: Install the package "git"
+      ansible.builtin.apt:
+        name: git
+
+    - name: Install the package "gparted"
+      ansible.builtin.apt:
+        name: gparted
+
+    - name: Echo IP address
+      lineinfile:
+        path: /etc/resolv.conf
+        line: 'nameserver 172.30.30.3'
+
+    - name: Download nodesource setup script
+      command: curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+
+    - name: Make the setup script executable
+      command: chmod +x nodesource_setup.sh
+
+    - name: Execute the setup script
+      command: bash nodesource_setup.sh
+
+    - name: Execute the setup script
+      command: apt-get install nodejs -y
+
+    - name: Clone repository
+      git:
+        repo: https://gitlab.thebull.ru/Kuznetsov/magicmirrorqr.git
+        dest: /home/rock/electron_qr
+        version: master
+
+    - name: Run npm install
+      command: npm install
+      args:
+        chdir: /home/rock/electron_qr
+
+    - name: Execute the setup script
+      command: systemctl enable zabbix-agent
+
+    - name: Execute the setup script
+      command: wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb
+
+    - name: Execute the setup script
+      command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
