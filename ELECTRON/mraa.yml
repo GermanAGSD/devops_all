@@ -1,0 +1,16 @@
+
+# for arm bian apt update cache not available
+---
+- name: Install mra for cintrol pins GPIO Uart I2C
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Execute the setup script
+      command: sudo add-apt-repository ppa:mraa/mraa
+
+    - name: Execute the setup script
+      command: sudo apt-get update
+
+    - name: Execute the setup script
+      command: sudo apt-get install libmraa2 libmraa-dev libmraa-java python-mraa python3-mraa node-mraa mraa-tools
