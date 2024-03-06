@@ -6,7 +6,7 @@
   tasks:
 
 #    - name: Execute the setup script
-#      command: apt-get update && apt-get upgrade -y
+#      command: apt update && apt upgrade -y
 #    - name: Execute the setup script
 #      command: apt upgrade -y
     - name: Install Docker SDK for Python
