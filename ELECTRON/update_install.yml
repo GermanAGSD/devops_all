@@ -67,24 +67,24 @@
 
     - name: Execute the setup script
       command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
-
-    - name: Execute the setup script
-      command: echo "
-        [Unit]
-        Description=Magic Mirroring
-        After=network.target
-        StartLimitIntervalSec=0
-        
-        [Service]
-        Type=simple
-        Restart=always
-        RestartSec=1
-        User=qr
-        WorkingDirectory=/home/rock/electron_qr
-        ExecStart=/usr/bin/npm start
-        
-        [Install]
-        WantedBy=multi-user.target" >> /etc/systemd/system/qr.service
+#
+#    - name: Execute the setup script
+#      command: echo "
+#        [Unit]
+#        Description=Magic Mirroring
+#        After=network.target
+#        StartLimitIntervalSec=0
+#
+#        [Service]
+#        Type=simple
+#        Restart=always
+#        RestartSec=1
+#        User=qr
+#        WorkingDirectory=/home/rock/electron_qr
+#        ExecStart=/usr/bin/npm start
+#
+#        [Install]
+#        WantedBy=multi-user.target" >> /etc/systemd/system/qr.service
 
     - name: Execute the setup script
       command: systemctl enable qr.service
