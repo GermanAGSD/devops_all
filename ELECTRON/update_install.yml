@@ -86,8 +86,8 @@
 #        [Install]
 #        WantedBy=multi-user.target" >> /etc/systemd/system/qr.service
 
-    - name: Execute the setup script
-      command: systemctl enable qr.service
+    # - name: Execute the setup script
+    #   command: systemctl enable qr.service
 
-    - name: Execute the setup script
-      command: systemctl restart qr.service
+    # - name: Execute the setup script
+    #   command: systemctl restart qr.service
