@@ -19,6 +19,8 @@
       debug:
         var: address_list_print.stdout_lines
 
+
+
 #
 #    - name: Gather facts
 #      community.routeros.facts:
