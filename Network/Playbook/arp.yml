@@ -1,0 +1,8 @@
+---
+- name: RouterOS arp
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Change Arp timeout
+      routeros_command:
+        commands: /delay 10000ms;ip arp remove [find where !mac-address and !complete]
