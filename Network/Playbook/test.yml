@@ -9,11 +9,11 @@
           - /system resource print
       register: address_list_print
 
-    - name: Save result to file
-      copy:
-        content: "{{ address_list_print.stdout }}"
-        dest: ../Data/result
-      delegate_to: localhost
+    # - name: Save result to file
+    #   copy:
+    #     content: "{{ address_list_print.stdout }}"
+    #     dest: ../Data/result
+    #   delegate_to: localhost
 
     - name: Show system resources
       debug:
