@@ -5,4 +5,4 @@
   tasks:
     - name: Change Arp timeout
       routeros_command:
-        commands: /delay 10000ms;ip arp remove [find where !mac-address and !complete]
+        commands: /ip dhcp-server/set lease-script="delay 10000ms; ip arp remove [find where !mac-address and !complete]" numbers=0
