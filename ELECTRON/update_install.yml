@@ -5,15 +5,16 @@
   become: yes
   tasks:
 
-#    - name: Execute the setup script
-#      command: apt update && apt upgrade -y
+    - name: Execute the setup script
+      command: apt-get update && apt-get upgrade -y
+
 #    - name: Execute the setup script
 #      command: apt upgrade -y
-    - name: Install Docker SDK for Python
-      ansible.builtin.pip:
-        name:
-          - "docker==6.1.3"
-          - "docker-compose"
+    # - name: Install Docker SDK for Python
+    #   ansible.builtin.pip:
+    #     name:
+    #       - "docker==6.1.3"
+    #       - "docker-compose"
 
     - name: Install the package "vim"
       ansible.builtin.apt:
@@ -62,11 +63,11 @@
     - name: Execute the setup script
       command: systemctl enable zabbix-agent
 
-    - name: Execute the setup script
-      command: wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb
+    # - name: Execute the setup script
+    #   command: wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb
 
-    - name: Execute the setup script
-      command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
+    # - name: Execute the setup script
+    #   command: sudo apt install -fy ./rustdesk-1.2.3-aarch64.deb
 #
 #    - name: Execute the setup script
 #      command: echo "
