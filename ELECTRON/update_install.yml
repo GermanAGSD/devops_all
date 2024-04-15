@@ -9,7 +9,7 @@
       command: apt update -y
 
     - name: Execute the setup script
-      command: apt upgrade -y
+      command: apt upgrade
 #    - name: Execute the setup script
 #      command: apt upgrade -y
     # - name: Install Docker SDK for Python
