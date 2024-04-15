@@ -5,11 +5,12 @@
   become: yes
   tasks:
 
-    - name: Execute the setup script
-      command: apt update -y
+# Paramaters use cli shell 
+    # - name: Execute the setup script
+    #   command: apt update -y
 
-    - name: Execute the setup script
-      command: apt upgrade
+    # - name: Execute the setup script
+    #   command: apt upgrade
 #    - name: Execute the setup script
 #      command: apt upgrade -y
     # - name: Install Docker SDK for Python
