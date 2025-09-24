@@ -1,0 +1,40 @@
+---
+- name: RouterOS remove address list
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - name: Gather system resources
+      community.routeros.command:
+        commands:
+          - /ip fi address-list remove [find list=direct]
+          - /ip firewall address-list add list=direct address=172.29.29.0/24
+          - /ip firewall address-list add list=direct address=172.30.30.0/24
+          - /ip firewall address-list add list=direct address=172.30.31.0/24
+          - /ip firewall address-list add list=direct address=172.31.31.0/24
+          - /ip firewall address-list add list=direct address=192.168.22.0/26
+          - /ip firewall address-list add list=direct address=192.168.23.0/24
+          - /ip firewall address-list add list=direct address=10.78.0.0/16
+          - /ip firewall address-list add list=direct address=10.0.2.0/23
+          - /ip firewall address-list add list=direct address=10.10.0.0/23
+          - /ip firewall address-list add list=direct address=10.77.0.0/16
+          - /ip firewall address-list add list=direct address=10.97.0.0/16
+          - /ip firewall address-list add list=direct address=10.99.0.0/16
+          - /ip firewall address-list add list=direct address=192.168.155.0/24
+          - /ip firewall address-list add list=direct address=192.168.153.0/24
+          - /ip firewall address-list add list=direct address=10.40.0.0/16 comment="tula"
+          - /ip firewall address-list add list=direct address=10.71.0.0/16 comment="kauga"
+          - /ip firewall address-list add list=direct address=10.199.0.0/16
+          - /ip firewall address-list add list=direct address=10.1.2.0/30
+          - /ip firewall address-list add list=direct address=192.168.88.0/24
+          - /ip firewall address-list add list=direct address=10.11.0.0/16 comment="Armenia"
+          - /ip firewall address-list add list=direct address=192.168.19.0/24
+          - /ip firewall address-list add list=direct address=10.177.109.0/24
+          - /ip firewall address-list add list=direct address=10.11.1.0/24
+
+      register: remove_address
+
+
+    - name: Show system resources
+      debug:
+        var: remove_address.stdout_lines
