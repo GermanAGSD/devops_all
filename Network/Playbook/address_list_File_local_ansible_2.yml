@@ -1,0 +1,72 @@
+---
+# Upload to MikroTik, import, cleanup (локальный источник файла)
+- name: Upload local .rsc to MikroTik, import, cleanup
+  hosts: mikrotik
+  gather_facts: no
+  collections:
+    - community.routeros
+    - ansible.netcommon
+    - ansible.builtin
+
+  vars:
+    list_name: "direct"
+    local_dir: "/address-lists/incoming/direct"
+    filename: "addrlist-direct--2400-0-203942.rsc"
+    local_src: "{{ local_dir }}/{{ filename }}"
+    dest_file: "{{ filename }}"
+
+  tasks:
+    - name: Verify local source file exists on control host (once)
+      stat:
+        path: "{{ local_src }}"
+      register: src_stat
+      delegate_to: localhost
+      run_once: true
+
+    - name: Fail if local source file missing (once)
+      fail:
+        msg: "Local source file {{ local_src }} not found on control host"
+      when: not src_stat.stat.exists
+      run_once: true
+
+    - name: Pre-remove old file on MikroTik (avoid idempotency warning)
+      community.routeros.command:
+        commands:
+          - "/file remove {{ dest_file }}"
+      ignore_errors: true
+      tags: [cleanup]
+
+    - name: Upload .rsc to MikroTik
+      ansible.netcommon.net_put:
+        src: "{{ local_src }}"
+        dest: "{{ dest_file }}"
+      tags: [upload]
+
+    - name: Import with robust pre-clear and guaranteed cleanup
+      block:
+        - name: Hard clear address-list before import
+          community.routeros.command:
+            commands:
+              - "/ip firewall address-list remove [find where list={{ list_name }}]"
+          ignore_errors: true
+          tags: [clear]
+
+        - name: Import file on MikroTik (do not fail on duplicates)
+          community.routeros.command:
+            commands:
+              - "/import file-name={{ dest_file }}"
+          register: import_out
+          failed_when: false          # не падаем даже если в stdout есть Script Error
+          tags: [import]
+
+        - name: Show import result
+          debug:
+            var: import_out.stdout_lines
+
+      always:
+        - name: Remove uploaded file from MikroTik
+          community.routeros.command:
+            commands:
+              - "/file remove {{ dest_file }}"
+          ignore_errors: true
+          tags: [cleanup]
