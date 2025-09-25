@@ -1,0 +1,4 @@
+ssh-keygen -R 10.0.2.54
+
+ssh-keyscan -T 15 -p 22 -H -t ecdsa,ed25519,rsa 10.0.2.54 >> ~/.ssh/known_hosts
+ansible-playbook -i inventory.ini test_mikrotick.yml -l 10.0.2.54 -vvv
