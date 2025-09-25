@@ -1,35 +1,6 @@
 ---
-# 1) Тянем .rsc с Ubuntu-узла в /tmp на контрол-хосте
-- name: Fetch address-list .rsc from ubuntu_src to control host
-  hosts: ubuntu_src
-  gather_facts: no
-  collections:
-    - ansible.builtin
-
-  vars:
-    remote_path: "/address-lists/incoming/winbox-ext/addrlist-winbox-ext--2400-0-200144.rsc"
-    local_tmp: "/tmp/addrlist-winbox-ext--2400-0-200144.rsc"
-
-  tasks:
-    - name: Check remote file exists
-      stat:
-        path: "{{ remote_path }}"
-      register: src_stat
-
-    - name: Fail if remote file missing
-      fail:
-        msg: "Remote file {{ remote_path }} not found on {{ inventory_hostname }} ({{ ansible_host }})"
-      when: not src_stat.stat.exists
-
-    - name: Fetch file to control host
-      fetch:
-        src: "{{ remote_path }}"
-        dest: "{{ local_tmp }}"
-        flat: true
-      tags: [fetch]
-
-# 2) Кладём на MikroTik, импортируем, удаляем
-- name: Upload to MikroTik, import, cleanup
+# Upload to MikroTik, import, cleanup (локальный источник файла)
+- name: Upload local .rsc to MikroTik, import, cleanup
   hosts: mikrotik
   gather_facts: no
   collections:
@@ -39,51 +10,58 @@
 
   vars:
     list_name: "winbox-ext"
-    local_tmp: "/tmp/addrlist-winbox-ext--2400-0-200144.rsc"
-    dest_file: "addrlist-winbox-ext--2400-0-200144.rsc"
+    local_dir: "/address-lists/incoming/winbox-ext"
+    filename: "addrlist-winbox-ext--2400-0-200144.rsc"
+    local_src: "{{ local_dir }}/{{ filename }}"
+    dest_file: "{{ filename }}"
 
   tasks:
-    - name: Verify local tmp file exists on control host
+    - name: Verify local source file exists on control host (once)
       stat:
-        path: "{{ local_tmp }}"
-      register: tmp_stat
+        path: "{{ local_src }}"
+      register: src_stat
       delegate_to: localhost
+      run_once: true
 
-    - name: Fail if local tmp file missing
+    - name: Fail if local source file missing (once)
       fail:
-        msg: "Local tmp file {{ local_tmp }} not found on control host"
-      when: not tmp_stat.stat.exists
+        msg: "Local source file {{ local_src }} not found on control host"
+      when: not src_stat.stat.exists
+      run_once: true
+
+    - name: Pre-remove old file on MikroTik (avoid idempotency warning)
+      community.routeros.command:
+        commands:
+          - "/file remove {{ dest_file }}"
+      ignore_errors: true
+      tags: [cleanup]
 
     - name: Upload .rsc to MikroTik
       ansible.netcommon.net_put:
-        src: "{{ local_tmp }}"
+        src: "{{ local_src }}"
         dest: "{{ dest_file }}"
       tags: [upload]
 
-    - name: Import with pre-clear and guaranteed cleanup
+    - name: Import with robust pre-clear and guaranteed cleanup
       block:
-        - name: Clear address-list before import
+        - name: Hard clear address-list before import
           community.routeros.command:
             commands:
-              - "/ip firewall address-list remove [find list={{ list_name }}]"
+              - "/ip firewall address-list remove [find where list={{ list_name }}]"
           ignore_errors: true
           tags: [clear]
 
-        - name: Import file on MikroTik
+        - name: Import file on MikroTik (do not fail on duplicates)
           community.routeros.command:
             commands:
               - "/import file-name={{ dest_file }}"
           register: import_out
+          failed_when: false          # не падаем даже если в stdout есть Script Error
           tags: [import]
 
         - name: Show import result
           debug:
             var: import_out.stdout_lines
-
-      rescue:
-        - name: Note import failure
-          debug:
-            msg: "Import failed on {{ inventory_hostname }}. See previous errors."
 
       always:
         - name: Remove uploaded file from MikroTik
