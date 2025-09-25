@@ -1,13 +1,10 @@
 ---
-# Явно укажем коллекции, чтобы Ansible подхватил правильные модули
-collections:
-  - community.routeros
-  - ansible.netcommon
-
 # 1) Тянем .rsc с Ubuntu-узла в /tmp на контрол-хосте
 - name: Fetch address-list .rsc from ubuntu_src to control host
   hosts: ubuntu_src
   gather_facts: no
+  collections:
+    - ansible.builtin
 
   vars:
     remote_path: "/address-lists/incoming/winbox-ext/addrlist-winbox-ext--2400-0-200144.rsc"
@@ -15,17 +12,17 @@ collections:
 
   tasks:
     - name: Check remote file exists
-      ansible.builtin.stat:
+      stat:
         path: "{{ remote_path }}"
       register: src_stat
 
     - name: Fail if remote file missing
-      ansible.builtin.fail:
+      fail:
         msg: "Remote file {{ remote_path }} not found on {{ inventory_hostname }} ({{ ansible_host }})"
       when: not src_stat.stat.exists
 
     - name: Fetch file to control host
-      ansible.builtin.fetch:
+      fetch:
         src: "{{ remote_path }}"
         dest: "{{ local_tmp }}"
         flat: true
@@ -35,6 +32,10 @@ collections:
 - name: Upload to MikroTik, import, cleanup
   hosts: mikrotik
   gather_facts: no
+  collections:
+    - community.routeros
+    - ansible.netcommon
+    - ansible.builtin
 
   vars:
     list_name: "winbox-ext"
@@ -43,13 +44,13 @@ collections:
 
   tasks:
     - name: Verify local tmp file exists on control host
-      ansible.builtin.stat:
+      stat:
         path: "{{ local_tmp }}"
       register: tmp_stat
       delegate_to: localhost
 
     - name: Fail if local tmp file missing
-      ansible.builtin.fail:
+      fail:
         msg: "Local tmp file {{ local_tmp }} not found on control host"
       when: not tmp_stat.stat.exists
 
@@ -76,12 +77,12 @@ collections:
           tags: [import]
 
         - name: Show import result
-          ansible.builtin.debug:
+          debug:
             var: import_out.stdout_lines
 
       rescue:
         - name: Note import failure
-          ansible.builtin.debug:
+          debug:
             msg: "Import failed on {{ inventory_hostname }}. See previous errors."
 
       always:
