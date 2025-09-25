@@ -1,17 +1,20 @@
 ---
-# =========================
-# 1) Забрать файл с Ubuntu
-# =========================
+# Явно укажем коллекции, чтобы Ansible подхватил правильные модули
+collections:
+  - community.routeros
+  - ansible.netcommon
+
+# 1) Тянем .rsc с Ubuntu-узла в /tmp на контрол-хосте
 - name: Fetch address-list .rsc from ubuntu_src to control host
   hosts: ubuntu_src
   gather_facts: no
 
   vars:
-    remote_path: /address-lists/incoming/winbox-ext/addrlist-winbox-ext--2400-0-200144.rsc
-    local_tmp: /tmp/addrlist-winbox-ext--2400-0-200144.rsc
+    remote_path: "/address-lists/incoming/winbox-ext/addrlist-winbox-ext--2400-0-200144.rsc"
+    local_tmp: "/tmp/addrlist-winbox-ext--2400-0-200144.rsc"
 
   tasks:
-    - name: Ensure remote file exists
+    - name: Check remote file exists
       ansible.builtin.stat:
         path: "{{ remote_path }}"
       register: src_stat
@@ -25,20 +28,18 @@
       ansible.builtin.fetch:
         src: "{{ remote_path }}"
         dest: "{{ local_tmp }}"
-        flat: yes
+        flat: true
       tags: [fetch]
 
-# =========================================
-# 2) Залить на MikroTik, импортнуть, убрать
-# =========================================
-- name: Upload, import into RouterOS and cleanup
+# 2) Кладём на MikroTik, импортируем, удаляем
+- name: Upload to MikroTik, import, cleanup
   hosts: mikrotik
   gather_facts: no
 
   vars:
-    list_name: winbox-ext
-    local_tmp: /tmp/addrlist-winbox-ext--2400-0-200144.rsc
-    dest_file: addrlist-winbox-ext--2400-0-200144.rsc
+    list_name: "winbox-ext"
+    local_tmp: "/tmp/addrlist-winbox-ext--2400-0-200144.rsc"
+    dest_file: "addrlist-winbox-ext--2400-0-200144.rsc"
 
   tasks:
     - name: Verify local tmp file exists on control host
@@ -58,19 +59,19 @@
         dest: "{{ dest_file }}"
       tags: [upload]
 
-    - name: Import address-list with cleanup guard
+    - name: Import with pre-clear and guaranteed cleanup
       block:
-        - name: (Optional) clear '{{ list_name }}' list before import
-          community.routeros.routeros_command:
+        - name: Clear address-list before import
+          community.routeros.command:
             commands:
-              - /ip firewall address-list remove [find list={{ list_name }}]
-          ignore_errors: yes
+              - "/ip firewall address-list remove [find list={{ list_name }}]"
+          ignore_errors: true
           tags: [clear]
 
         - name: Import file on MikroTik
-          community.routeros.routeros_command:
+          community.routeros.command:
             commands:
-              - /import file-name={{ dest_file }}
+              - "/import file-name={{ dest_file }}"
           register: import_out
           tags: [import]
 
@@ -79,14 +80,14 @@
             var: import_out.stdout_lines
 
       rescue:
-        - name: Print error context
+        - name: Note import failure
           ansible.builtin.debug:
             msg: "Import failed on {{ inventory_hostname }}. See previous errors."
 
       always:
         - name: Remove uploaded file from MikroTik
-          community.routeros.routeros_command:
+          community.routeros.command:
             commands:
-              - /file remove "{{ dest_file }}"
-          ignore_errors: yes
+              - "/file remove {{ dest_file }}"
+          ignore_errors: true
           tags: [cleanup]
