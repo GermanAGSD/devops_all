@@ -1,0 +1,92 @@
+---
+# =========================
+# 1) Забрать файл с Ubuntu
+# =========================
+- name: Fetch address-list .rsc from ubuntu_src to control host
+  hosts: ubuntu_src
+  gather_facts: no
+
+  vars:
+    remote_path: /address-lists/incoming/winbox-ext/addrlist-winbox-ext--2400-0-200144.rsc
+    local_tmp: /tmp/addrlist-winbox-ext--2400-0-200144.rsc
+
+  tasks:
+    - name: Ensure remote file exists
+      ansible.builtin.stat:
+        path: "{{ remote_path }}"
+      register: src_stat
+
+    - name: Fail if remote file missing
+      ansible.builtin.fail:
+        msg: "Remote file {{ remote_path }} not found on {{ inventory_hostname }} ({{ ansible_host }})"
+      when: not src_stat.stat.exists
+
+    - name: Fetch file to control host
+      ansible.builtin.fetch:
+        src: "{{ remote_path }}"
+        dest: "{{ local_tmp }}"
+        flat: yes
+      tags: [fetch]
+
+# =========================================
+# 2) Залить на MikroTik, импортнуть, убрать
+# =========================================
+- name: Upload, import into RouterOS and cleanup
+  hosts: mikrotik
+  gather_facts: no
+
+  vars:
+    list_name: winbox-ext
+    local_tmp: /tmp/addrlist-winbox-ext--2400-0-200144.rsc
+    dest_file: addrlist-winbox-ext--2400-0-200144.rsc
+
+  tasks:
+    - name: Verify local tmp file exists on control host
+      ansible.builtin.stat:
+        path: "{{ local_tmp }}"
+      register: tmp_stat
+      delegate_to: localhost
+
+    - name: Fail if local tmp file missing
+      ansible.builtin.fail:
+        msg: "Local tmp file {{ local_tmp }} not found on control host"
+      when: not tmp_stat.stat.exists
+
+    - name: Upload .rsc to MikroTik
+      ansible.netcommon.net_put:
+        src: "{{ local_tmp }}"
+        dest: "{{ dest_file }}"
+      tags: [upload]
+
+    - name: Import address-list with cleanup guard
+      block:
+        - name: (Optional) clear '{{ list_name }}' list before import
+          community.routeros.routeros_command:
+            commands:
+              - /ip firewall address-list remove [find list={{ list_name }}]
+          ignore_errors: yes
+          tags: [clear]
+
+        - name: Import file on MikroTik
+          community.routeros.routeros_command:
+            commands:
+              - /import file-name={{ dest_file }}
+          register: import_out
+          tags: [import]
+
+        - name: Show import result
+          ansible.builtin.debug:
+            var: import_out.stdout_lines
+
+      rescue:
+        - name: Print error context
+          ansible.builtin.debug:
+            msg: "Import failed on {{ inventory_hostname }}. See previous errors."
+
+      always:
+        - name: Remove uploaded file from MikroTik
+          community.routeros.routeros_command:
+            commands:
+              - /file remove "{{ dest_file }}"
+          ignore_errors: yes
+          tags: [cleanup]
