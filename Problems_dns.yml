@@ -1,0 +1,23 @@
+  semaphore:
+    image: semaphoreui/semaphore:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    dns:
+      - 172.30.30.3
+      - 8.8.8.8
+    environment:
+      SEMAPHORE_DB_HOST: mysql
+
+# если iptables (legacy/nft режим неважно – синтаксис одинаков)
+sudo iptables -I INPUT -i docker0 -p tcp --dport 443 -j ACCEPT
+
+# если есть кастомные сети br-XXXX, можно разово открыть для всех docker-интерфейсов:
+for i in $(ip -o link show | awk -F': ' '/^ *[0-9]+: (docker0|br-)/{print $2}'); do
+  sudo iptables -I INPUT -i "$i" -p tcp --dport 443 -j ACCEPT
+done
+
+
+getent hosts gitlab.thebull.ru
+nc -vz gitlab.thebull.ru 443 || true
+curl -I --connect-timeout 5 https://gitlab.thebull.ru || true
