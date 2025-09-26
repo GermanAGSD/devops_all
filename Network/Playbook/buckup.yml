@@ -29,13 +29,16 @@
         dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.rsc
         protocol: sftp
 
-    - name: remove backup
-      routeros_command:
-        commands: /file remove [find name~".*\\.backup\$"]
+    - name: Remove system backup file from RouterOS
+      community.routeros.command:
+        commands:
+          - '/file remove "{{ inventory_hostname }}.backup"'
 
-    - name: remove backup
-      routeros_command:
-        commands: /file remove [find name~".*\\.rsc\$"]
+    - name: Remove export file from RouterOS
+      community.routeros.command:
+        commands:
+          - '/file remove "{{ inventory_hostname }}.rsc"'
+
 
 
 #    - name: Copying ROS System Backup to Local Host
