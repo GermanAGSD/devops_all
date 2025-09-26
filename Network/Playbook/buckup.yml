@@ -1,6 +1,6 @@
 ---
 - name: RouterOS Backup
-  hosts: all
+  hosts: mikrotik
   gather_facts: true
   tasks:
 
