@@ -1,0 +1,61 @@
+---
+- name: RouterOS Backup (refactored)
+  hosts: all
+  gather_facts: false
+  collections:
+    - community.routeros
+    - ansible.netcommon
+    - ansible.builtin
+
+  vars:
+    # Метка времени без вызова внешних команд
+    ts: "{{ now().strftime('%Y-%m-%d-%H-%M') }}"
+    # Базовые имена файлов на устройстве
+    backup_basename: "{{ inventory_hostname }}"
+    export_filename: "{{ backup_basename }}.rsc"
+    system_backup_filename: "{{ backup_basename }}.backup"
+    # Куда складывать файлы локально (оставляю 'buckup' как в исходнике)
+    local_backup_dir: "/home/ansible/Mikrotick/Buckup"
+    local_export_path: "{{ local_backup_dir }}/{{ inventory_hostname }}-{{ ts }}.rsc"
+    local_system_backup_path: "{{ local_backup_dir }}/{{ inventory_hostname }}-{{ ts }}.backup"
+
+  tasks:
+    - name: Ensure local backup directory exists (controller)
+      file:
+        path: "{{ local_backup_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Create config export on RouterOS
+      community.routeros.command:
+        commands:
+          - "/export file={{ export_filename }}"
+
+    - name: Create system backup on RouterOS (dont-encrypt)
+      community.routeros.command:
+        commands:
+          - "/system backup save dont-encrypt=yes name={{ backup_basename }}"
+
+    - name: Download system backup to controller
+      ansible.netcommon.net_get:
+        src: "{{ system_backup_filename }}"
+        dest: "{{ local_system_backup_path }}"
+        protocol: sftp
+
+    - name: Download config export to controller
+      ansible.netcommon.net_get:
+        src: "{{ export_filename }}"
+        dest: "{{ local_export_path }}"
+        protocol: sftp
+
+    - name: Remove system backup file from RouterOS
+      community.routeros.command:
+        commands:
+          - "/file remove [find name~\".*\\.backup$\"]"
+
+    - name: Remove export file from RouterOS
+      community.routeros.command:
+        commands:
+          - "/file remove [find name~\".*\\.rsc$\"]"
