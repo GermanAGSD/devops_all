@@ -53,9 +53,10 @@
     - name: Remove system backup file from RouterOS
       community.routeros.command:
         commands:
-          - "/file remove [find name~\".*\\.backup$\"]"
+          - "/file remove {{ inventory_hostname }}.backup"
 
     - name: Remove export file from RouterOS
       community.routeros.command:
         commands:
-          - "/file remove [find name~\".*\\.rsc$\"]"
+          - "/file remove {{ inventory_hostname }}.rsc"
+
