@@ -1,0 +1,131 @@
+---
+- name: System & Docker audit
+  hosts: all
+  gather_facts: true
+  vars:
+    report_dir: "./reports"
+    report_csv: "{{ report_dir }}/system_audit.csv"
+    host_json_dir: "{{ report_dir }}/hosts"
+
+  pre_tasks:
+    - name: Ensure report directories exist (controller)
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ report_dir }}"
+        - "{{ host_json_dir }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Create CSV header if file missing (controller)
+      copy:
+        dest: "{{ report_csv }}"
+        content: |-
+          host,os_family,os_name,os_version,kernel,uptime,cpu_count,mem_total_mb,docker_version,containers_running,ipv4_list
+      args:
+        force: no          # не переписывать, если уже есть
+      delegate_to: localhost
+      run_once: true
+
+  collections:
+    - community.docker
+
+  tasks:
+    # ---- Docker (без ошибок, если не установлен) ----
+    - name: Get Docker host info (if Docker present)
+    # не требует root, но чаще сокет root. Можно become: true при необходимости.
+      community.docker.docker_host_info:
+      register: docker_info
+      failed_when: false
+      changed_when: false
+      become: true
+
+    - name: Get Docker containers info (if Docker present)
+      community.docker.docker_container_info:
+      register: containers_info
+      failed_when: false
+      changed_when: false
+      become: true
+
+    # ---- Подготовим удобные факты ----
+    - name: Build summarized facts
+      set_fact:
+        os_family: "{{ ansible_facts.os_family | default('') }}"
+        os_name: "{{ ansible_facts.distribution | default('') }}"
+        os_version: "{{ ansible_facts.distribution_version | default('') }}"
+        kernel: "{{ ansible_facts.kernel | default('') }}"
+        uptime: "{{ ansible_facts.uptime | default('') }}"
+        cpu_count: "{{ ansible_facts.processor_vcpus | default(ansible_facts.processor_count | default(0)) }}"
+        mem_total_mb: "{{ (ansible_facts.memtotal_mb | default(0)) | int }}"
+        ipv4_list: "{{ ansible_all_ipv4_addresses | default([]) | join(';') }}"
+        docker_version: "{{ docker_info.host_info.ServerVersion | default('n/a') }}"
+        containers_running: "{{ docker_info.host_info.ContainersRunning | default(0) }}"
+        containers_list: >-
+          {{ (containers_info.containers | default([])) |
+              json_query('[].{Name: Name, Image: Image, State: State.Status, ID: Id}') }}
+
+    # ---- Пишем CSV строку ----
+    - name: Append CSV line for this host (controller)
+      lineinfile:
+        path: "{{ report_csv }}"
+        insertafter: EOF
+        line: >-
+          {{ inventory_hostname }},
+          {{ os_family }},
+          {{ os_name }},
+          {{ os_version }},
+          {{ kernel }},
+          {{ uptime }},
+          {{ cpu_count }},
+          {{ mem_total_mb }},
+          {{ docker_version }},
+          {{ containers_running }},
+          "{{ ipv4_list }}"
+      delegate_to: localhost
+
+    # ---- Готовим подробный JSON по хосту ----
+    - name: Build per-host JSON report
+      set_fact:
+        audit_report:
+          host: "{{ inventory_hostname }}"
+          fqdn: "{{ ansible_facts.fqdn | default('') }}"
+          os:
+            family: "{{ os_family }}"
+            name: "{{ os_name }}"
+            version: "{{ os_version }}"
+            kernel: "{{ kernel }}"
+            timezone: "{{ ansible_facts.tz | default('') }}"
+            date_time: "{{ ansible_facts.date_time | default({}) }}"
+            uptime: "{{ uptime }}"
+          hardware:
+            arch: "{{ ansible_facts.architecture | default('') }}"
+            cpu_vcpus: "{{ cpu_count }}"
+            mem_total_mb: "{{ mem_total_mb }}"
+          network:
+            hostname: "{{ ansible_facts.hostname | default('') }}"
+            ipv4: "{{ ansible_all_ipv4_addresses | default([]) }}"
+            interfaces: "{{ ansible_facts.interfaces | default([]) }}"
+            default_ipv4: "{{ ansible_facts.default_ipv4 | default({}) }}"
+            dns: "{{ ansible_facts.dns | default({}) }}"
+          docker:
+            version: "{{ docker_version }}"
+            containers_running: "{{ containers_running }}"
+            containers: "{{ containers_list | default([]) }}"
+
+    - name: Save per-host JSON on controller
+      copy:
+        dest: "{{ host_json_dir }}/{{ inventory_hostname }}.json"
+        content: "{{ audit_report | to_nice_json }}"
+        mode: "0644"
+      delegate_to: localhost
+
+  post_tasks:
+    - name: Show where reports are saved (controller)
+      debug:
+        msg:
+          - "CSV: {{ report_csv }}"
+          - "JSON per host: {{ host_json_dir }}/<host>.json"
+      delegate_to: localhost
+      run_once: true
