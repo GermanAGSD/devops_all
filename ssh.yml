@@ -1,0 +1,8 @@
+# Генерация ключа
+ssh-keygen -t rsa -b 4096 -C "ansible@172.30.30.18"
+
+# раскидать публичный ключ
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@172.30.30.19
+
+# Вход по ключу
+ssh -i ~/.ssh/id_rsa root@172.30.30.18
