@@ -20,13 +20,13 @@
     - name: Downloading buckup file
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.backup"
-        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.backup
+        dest: /home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.backup
         protocol: sftp
 
     - name: Downloading configuration files
       ansible.netcommon.net_get:
         src: "{{ inventory_hostname }}.rsc"
-        dest: /home/semaphore/buckup/{{ inventory_hostname }}-{{ time }}.rsc
+        dest: /home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.rsc
         protocol: sftp
 
     - name: Remove system backup file from RouterOS
