@@ -1,0 +1,7 @@
+- name: Disk usage report
+  hosts: all
+  tasks:
+    - command: df -h
+      register: df_out
+    - debug:
+        var: df_out.stdout_lines
