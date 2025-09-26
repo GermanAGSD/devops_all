@@ -1,1 +1,7 @@
-
+- name: Get installed packages
+  hosts: all
+  tasks:
+    - name: Gather package facts
+      package_facts:
+    - debug:
+        var: ansible_facts.packages
