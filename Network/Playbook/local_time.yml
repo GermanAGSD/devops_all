@@ -1,0 +1,27 @@
+---
+- name: Show local time and timezone
+  hosts: all          # или укажи свою группу/хост
+  gather_facts: yes
+
+  tasks:
+    - name: Set timezone to Europe/Moscow
+      community.general.timezone:
+        name: Europe/Moscow
+    
+    - name: Show local time
+      ansible.builtin.command: date +"%F %T %Z %z"
+      register: now_out
+      changed_when: false
+
+    - name: Print local time
+      ansible.builtin.debug:
+        var: now_out.stdout
+
+    - name: Show timezone via timedatectl
+      ansible.builtin.command: timedatectl
+      register: tz_out
+      changed_when: false
+
+    - name: Print key timedatectl lines
+      ansible.builtin.debug:
+        msg: "{{ tz_out.stdout_lines | select('search','^(Local time:|Time zone:)') | list }}"
