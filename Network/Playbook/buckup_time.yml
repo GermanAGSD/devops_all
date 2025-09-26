@@ -50,13 +50,14 @@
         dest: "{{ local_export_path }}"
         protocol: sftp
 
-    - name: Remove system backup file from RouterOS
+    - name: Remove system backup file(s) by regex
       community.routeros.command:
         commands:
-          - "/file remove {{ inventory_hostname }}.backup"
+          - '/file remove [find where name~"\.backup$"]'
 
-    - name: Remove export file from RouterOS
+    - name: Remove export file(s) by regex
       community.routeros.command:
         commands:
-          - "/file remove {{ inventory_hostname }}.rsc"
+          - '/file remove [find where name~"\.rsc$"]'
+
 
