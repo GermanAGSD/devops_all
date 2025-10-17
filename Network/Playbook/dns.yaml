@@ -7,9 +7,8 @@
     - name: Add DNS records
       community.routeros.command:
         commands:
-          - /ip dns static add address=172.30.30.5 name=1cb.bull.local type=A disabled=no
-          - /ip dns static add address=172.30.30.21 name=1cb1.bull.local type=A disabled=no
-        
+          - /tool netwatch disable numbers=0
+          - /ip firewall nat set [find comment="failover-DNS"] disable=yes
     - name: Verify DNS records
       community.routeros.command:
         commands:
