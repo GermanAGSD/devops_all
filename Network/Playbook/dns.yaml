@@ -7,14 +7,9 @@
     - name: Add DNS records
       community.routeros.command:
         commands:
-          - /ip dns static add address=172.30.30.3 name=bull.local type=A disabled=no
-          - /ip dns static add address=172.30.30.3 name=dcbull.bull.local type=A disabled=no
-          - /ip dns static add address=172.30.30.4 name=service.thebull.ru type=A disabled=no
-          - /ip dns static add address=172.30.30.38 name=rdsgate.bull.local type=A disabled=no
-          - /ip dns static add name=rdp.bull.local type=CNAME cname=rdsgate.bull.local disabled=no
-          - /ip dns static add address=172.30.30.24 name=tsserv4.bull.local type=A disabled=no
-          - /ip dns static add address=172.30.30.54 name=tsserv5.bull.local type=A disabled=no
-
+          - /ip dns static add address=172.30.30.5 name=1cb.bull.local type=A disabled=no
+          - /ip dns static add address=172.30.30.21 name=1cb1.bull.local type=A disabled=no
+        
     - name: Verify DNS records
       community.routeros.command:
         commands:
