@@ -7,13 +7,13 @@
   tasks:
     - name: Upload files
       net_put:
-        src: ../Keys/badm.pub
+        src: ../keys/badm.pub
         dest: /{{inventory_hostname}}_ssh.pub
         protocol: sftp
 
     - name: Upload files
       net_put:
-        src: ../Keys/badm_key
+        src: ../keys/badm_key
         dest: /{{inventory_hostname}}_sshkey
         protocol: sftp
 
