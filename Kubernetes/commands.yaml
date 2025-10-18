@@ -1,2 +1,10 @@
 kubectl get node
 kubectl get pods
+kubectl run hello --generator=run-pod/v1 --image=registry.thebull.ru:latest --port=80
+kubectl delete pods hello
+kubectl describe pods hello - полная информация пода
+kubectl exec hello date
+kubectl exec -it hello sh - вход в под командная консоль
+kubectl logs hello 
+kubectl port-forward hello 7788:80 - 7788 это порт наружу
+kubectl apply -f my-web-service.yaml - создание пода из файла
