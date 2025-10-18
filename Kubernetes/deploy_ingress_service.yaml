@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-web-service
+spec:
+  selector:
+    app: my-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-web-deployment
+spec:
+  replicas: 3  # Убедимся, что реплик 3
+  selector:
+    matchLabels:
+      app: my-web
+  template:
+    metadata:
+      labels:
+        app: my-web
+    spec:
+      containers:
+        - name: container-apache
+          image: httpd:latest  # Исправленный образ
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-web-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Для автоматического перенаправления на HTTPS
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - my-web.thebull.ru  # Домен, который будет использоваться для доступа к сервису
+    secretName: my-web-tls  # Секрет для TLS, нужно создать этот секрет заранее
+  rules:
+  - host: my-web.thebull.ru  # Домен, на который будет настроен Ingress
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-web-service  # Имя вашего сервиса
+            port:
+              number: 80  # Порт, на который будет направлен трафик
