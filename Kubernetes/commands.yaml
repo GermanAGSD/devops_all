@@ -8,3 +8,5 @@ kubectl exec -it hello sh - вход в под командная консоль
 kubectl logs hello 
 kubectl port-forward hello 7788:80 - 7788 это порт наружу
 kubectl apply -f my-web-service.yaml - создание пода из файла
+kubectl get svc -n ingress-nginx - просмотр портов и ip nginx ingress
+
