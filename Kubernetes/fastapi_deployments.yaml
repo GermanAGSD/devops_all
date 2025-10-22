@@ -20,7 +20,6 @@ type: Opaque
 stringData:
   DATABASE_PASSWORD: "password123"
   SECRET_KEY: "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -37,7 +36,7 @@ spec:
         app: fastapi
     spec:
       imagePullSecrets:
-        - name: registry-secret
+        - name: registry-secret  # секрет для доступа к приватному registry
       containers:
         - name: fastapi
           image: registry.thebull.ru/python/fastapi_course:latest
@@ -50,6 +49,44 @@ spec:
                 name: fastapi-secrets
           command: ["uvicorn"]
           args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/ssl/fastapi  # каталог внутри контейнера, где будут лежать сертификаты
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: fastapi-tls  # тот самый TLS-секрет, созданный ранее
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: fastapi-deployment
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: fastapi
+#   template:
+#     metadata:
+#       labels:
+#         app: fastapi
+#     spec:
+#       imagePullSecrets:
+#         - name: registry-secret
+#       containers:
+#         - name: fastapi
+#           image: registry.thebull.ru/python/fastapi_course:latest
+#           ports:
+#             - containerPort: 8000
+#           envFrom:
+#             - configMapRef:
+#                 name: fastapi-config
+#             - secretRef:
+#                 name: fastapi-secrets
+#           command: ["uvicorn"]
+#           args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 apiVersion: v1
