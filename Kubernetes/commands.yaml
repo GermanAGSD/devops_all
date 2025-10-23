@@ -13,3 +13,4 @@ kubectl logs fastapi-deployment-647cb6bc79-brsqz
 
 kubectl get ingress fastapi-ingress
 kubectl delete deployment postgres-deployment
+kubectl logs -l app=fastapi --tail=50
