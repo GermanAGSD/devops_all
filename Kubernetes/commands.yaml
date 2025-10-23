@@ -11,4 +11,4 @@ kubectl apply -f my-web-service.yaml - создание пода из файла
 kubectl get svc -n ingress-nginx - просмотр портов и ip nginx ingress
 kubectl logs fastapi-deployment-647cb6bc79-brsqz
 
-
+kubectl get ingress fastapi-ingress
