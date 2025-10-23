@@ -12,3 +12,4 @@ kubectl get svc -n ingress-nginx - просмотр портов и ip nginx ing
 kubectl logs fastapi-deployment-647cb6bc79-brsqz
 
 kubectl get ingress fastapi-ingress
+kubectl delete deployment postgres-deployment
