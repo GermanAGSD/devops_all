@@ -1,4 +1,3 @@
----
 - name: RouterOS Backup
   hosts: mikrotik
   gather_facts: false
