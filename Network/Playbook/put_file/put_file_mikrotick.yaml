@@ -1,0 +1,55 @@
+---
+- name: Upload and execute DHCP leases script on MikroTik
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_user: badm
+    ansible_password: Nhb;ls<sr-3
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+  tasks:
+    - name: Delete File
+      community.routeros.command:
+        commands:
+          - /file remove dhcp-leases.rsc
+      register: script_execution
+
+    - name: Delete script
+      community.routeros.command:
+        commands:
+          - /system script remove Export-dhcp-leases
+      register: script_execution
+
+    - name: Upload DHCP leases script to MikroTik via SFTP
+      net_put:
+        src: dhcp-leases.rsc
+        dest: "/dhcp-leases.rsc"
+        protocol: sftp
+
+    - name: Check if file exists on MikroTik
+      community.routeros.command:
+        commands:
+          - /file print where name="dhcp-leases.rsc"
+      register: file_check
+
+    - name: Debug file check
+      debug:
+        var: file_check
+
+    - name: Import and run DHCP leases script on MikroTik
+      community.routeros.command:
+        commands:
+          - /import file=dhcp-leases.rsc
+      register: script_execution
+
+    - name: Execute Script rsc
+      community.routeros.command:
+        commands:
+          - /system script run Export-dhcp-leases
+      register: script_execution
+
+    - name: Debug script execution
+      debug:
+        var: script_execution
+
+
