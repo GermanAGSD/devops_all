@@ -1,7 +1,6 @@
 # 15 3 * * * /usr/bin/python3 /home/ansible/Playbook/Python_Script/cleanup_routeros_backups.py -v -r /home/ansible/Mikrotick/Buckup >> /var/log/cleanup_routeros_backups.log 2>&1
 # 0 2 * * * /usr/local/bin/ansible-playbook -i /home/ansible/Playbook/Network/inventory.ini /home/ansible/Playbook/Network/buckup.yml -vvv >> /var/log/ansible_buckup.log 2>&1
-    
-    root@ansible:/home/ansible/Playbook/Network# cat buckup.yml
+
   - name: RouterOS Backup
     hosts: mikrotik
     gather_facts: false
