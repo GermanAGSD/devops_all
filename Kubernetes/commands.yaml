@@ -15,3 +15,4 @@ kubectl get ingress fastapi-ingress
 kubectl delete deployment postgres-deployment
 kubectl logs -l app=fastapi --tail=50
 kubectl get ingress
+kubectl -n default logs -l app=fastapi --tail=200 -f
