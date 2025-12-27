@@ -1,63 +1,67 @@
-- name: RouterOS Backup
-  hosts: mikrotik
-  gather_facts: false
+# 15 3 * * * /usr/bin/python3 /home/ansible/Playbook/Python_Script/cleanup_routeros_backups.py -v -r /home/ansible/Mikrotick/Buckup >> /var/log/cleanup_routeros_backups.log 2>&1
+# 0 2 * * * /usr/local/bin/ansible-playbook -i /home/ansible/Playbook/Network/inventory.ini /home/ansible/Playbook/Network/buckup.yml -vvv >> /var/log/ansible_buckup.log 2>&1
+    
+    root@ansible:/home/ansible/Playbook/Network# cat buckup.yml
+  - name: RouterOS Backup
+    hosts: mikrotik
+    gather_facts: false
 
-  tasks:
-    - name: Set Backup Time
-      set_fact:
-        time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
+    tasks:
+      - name: Set Backup Time
+        set_fact:
+          time: "{{ lookup('pipe', 'date \"+%Y-%m-%d-%H-%M\"') }}"
 
-    # Экспорт конфигурации (создаст {{ inventory_hostname }}.rsc)
-    - name: Create config export (.rsc)
-      community.routeros.command:
-        commands:
-          - '/export file="{{ inventory_hostname }}"'
+      # Экспорт конфигурации (создаст {{ inventory_hostname }}.rsc)
+      - name: Create config export (.rsc)
+        community.routeros.command:
+          commands:
+            - '/export file="{{ inventory_hostname }}"'
 
-    # Системный бэкап (создаст {{ inventory_hostname }}.backup)
-    - name: Create system backup (.backup)
-      community.routeros.command:
-        commands:
-          - '/system backup save dont-encrypt=yes name="{{ inventory_hostname }}"'
+      # Системный бэкап (создаст {{ inventory_hostname }}.backup)
+      - name: Create system backup (.backup)
+        community.routeros.command:
+          commands:
+            - '/system backup save dont-encrypt=yes name="{{ inventory_hostname }}"'
 
-    # Подождать появления .backup (иногда пишется пару секунд)
-    - name: Wait for .backup file to appear
-      community.routeros.command:
-        commands:
-          - '/file print where name="{{ inventory_hostname }}.backup"'
-      register: backup_ls
-      retries: 5
-      delay: 2
-      until: backup_ls.stdout is defined and backup_ls.stdout | join('') is search("{{ inventory_hostname }}\\.backup")
+      # Подождать появления .backup (иногда пишется пару секунд)
+      - name: Wait for .backup file to appear
+        community.routeros.command:
+          commands:
+            - '/file print where name="{{ inventory_hostname }}.backup"'
+        register: backup_ls
+        retries: 5
+        delay: 2
+        until: backup_ls.stdout is defined and backup_ls.stdout | join('') is search("{{ inventory_hostname }}\\.backup")
 
-    # Подождать появления .rsc
-    - name: Wait for .rsc file to appear
-      community.routeros.command:
-        commands:
-          - '/file print where name="{{ inventory_hostname }}.rsc"'
-      register: rsc_ls
-      retries: 5
-      delay: 2
-      until: rsc_ls.stdout is defined and rsc_ls.stdout | join('') is search("{{ inventory_hostname }}\\.rsc")
+      # Подождать появления .rsc
+      - name: Wait for .rsc file to appear
+        community.routeros.command:
+          commands:
+            - '/file print where name="{{ inventory_hostname }}.rsc"'
+        register: rsc_ls
+        retries: 5
+        delay: 2
+        until: rsc_ls.stdout is defined and rsc_ls.stdout | join('') is search("{{ inventory_hostname }}\\.rsc")
 
-    - name: Downloading backup file
-      ansible.netcommon.net_get:
-        src: "{{ inventory_hostname }}.backup"
-        dest: "/home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.backup"
-        protocol: sftp
+      - name: Downloading backup file
+        ansible.netcommon.net_get:
+          src: "{{ inventory_hostname }}.backup"
+          dest: "/home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.backup"
+          protocol: sftp
 
-    - name: Downloading configuration export
-      ansible.netcommon.net_get:
-        src: "{{ inventory_hostname }}.rsc"
-        dest: "/home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.rsc"
-        protocol: sftp
+      - name: Downloading configuration export
+        ansible.netcommon.net_get:
+          src: "{{ inventory_hostname }}.rsc"
+          dest: "/home/ansible/Mikrotick/Buckup/{{ inventory_hostname }}-{{ time }}.rsc"
+          protocol: sftp
 
-    - name: Remove system backup file from RouterOS
-      community.routeros.command:
-        commands:
-          - '/file remove "{{ inventory_hostname }}.backup"'
+      - name: Remove system backup file from RouterOS
+        community.routeros.command:
+          commands:
+            - '/file remove "{{ inventory_hostname }}.backup"'
 
-    - name: Remove export file from RouterOS
-      community.routeros.command:
-        commands:
-          - '/file remove "{{ inventory_hostname }}.rsc"'
+      - name: Remove export file from RouterOS
+        community.routeros.command:
+          commands:
+            - '/file remove "{{ inventory_hostname }}.rsc"'
 
