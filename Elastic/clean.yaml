@@ -27,3 +27,15 @@ curl -X POST "http://172.30.30.19:9200/_all/_forcemerge?only_expunge_deletes=tru
 
   bash
   curl -X GET "http://172.30.30.19:9200/_cat/indices/filebeat-*?v&h=index,store.size"
+
+Удалите все индексы Filebeat
+  bash
+  curl -X DELETE "http://172.30.30.19:9200/filebeat-*"
+  
+Если нужно удалить все индексы (включая системные)
+  bash
+  curl -X DELETE "http://172.30.30.19:9200/_all"
+
+Проверьте освободившееся место
+  bash
+  curl -X GET "http://172.30.30.19:9200/_cat/allocation?v"
