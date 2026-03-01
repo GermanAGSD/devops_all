@@ -1,0 +1,29 @@
+Шаг 1: Удаление данных по условию
+  Используйте _delete_by_query, чтобы стереть данные старше определенного периода . Чаще всего чистят логи Filebeat, которые лежат в индексах вида filebeat-*.
+
+Замените 172.30.30.19:9200 на адрес вашего сервера Elasticsearch. Следующая команда удалит все документы в индексах filebeat-*, которые старше 30 дней:
+
+
+curl -X POST "http://172.30.30.19:9200/filebeat-*/_delete_by_query?pretty" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "range": {
+      "@timestamp": {
+        "lt": "now-30d",
+        "format": "epoch_millis"
+      }
+    }
+  }
+}'
+
+Шаг 2: Принудительная очистка и объединение (Force Merge)
+
+curl -X POST "http://172.30.30.19:9200/_all/_forcemerge?only_expunge_deletes=true&pretty"
+  
+  
+Убедитесь, что место освободилось.
+
+Проверьте размер индексов:
+
+  bash
+  curl -X GET "http://172.30.30.19:9200/_cat/indices/filebeat-*?v&h=index,store.size"
