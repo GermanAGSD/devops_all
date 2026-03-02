@@ -16,3 +16,9 @@ kubectl delete deployment postgres-deployment
 kubectl logs -l app=fastapi --tail=50
 kubectl get ingress
 kubectl -n default logs -l app=fastapi --tail=200 -f
+
+# Перезапуск контейнеров
+kubectl delete deployment password-frontend-deployment -n default
+kubectl apply -f password-frontend.yaml
+kubectl rollout status deployment/password-frontend-deployment -n default
+
