@@ -58,35 +58,6 @@ spec:
           secret:
             secretName: fastapi-tls  # тот самый TLS-секрет, созданный ранее
 
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: fastapi-deployment
-# spec:
-#   replicas: 2
-#   selector:
-#     matchLabels:
-#       app: fastapi
-#   template:
-#     metadata:
-#       labels:
-#         app: fastapi
-#     spec:
-#       imagePullSecrets:
-#         - name: registry-secret
-#       containers:
-#         - name: fastapi
-#           image: registry.thebull.ru/python/fastapi_course:latest
-#           ports:
-#             - containerPort: 8000
-#           envFrom:
-#             - configMapRef:
-#                 name: fastapi-config
-#             - secretRef:
-#                 name: fastapi-secrets
-#           command: ["uvicorn"]
-#           args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 apiVersion: v1
